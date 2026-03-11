@@ -1,0 +1,1 @@
+/usr/bin/c++  -Wall -Wshadow -Wl,--dependency-file=CMakeFiles/Prog_Printargs.dir/link.d CMakeFiles/Prog_Printargs.dir/Printargs.cpp.o -o Prog_Printargs

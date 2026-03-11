@@ -1,0 +1,1 @@
+/usr/bin/c++  -Wall -Wshadow -Wl,--dependency-file=CMakeFiles/Medie_T.dir/link.d CMakeFiles/Medie_T.dir/Medie_T_Gianni.cpp.o -o Medie_T

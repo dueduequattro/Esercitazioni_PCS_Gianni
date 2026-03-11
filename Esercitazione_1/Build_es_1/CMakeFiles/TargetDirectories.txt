@@ -1,0 +1,4 @@
+/home/pcsdocker/Data/Esercitazioni_PCS_Gianni/Esercitazione_1/Build_es_1/CMakeFiles/Medie_T.dir
+/home/pcsdocker/Data/Esercitazioni_PCS_Gianni/Esercitazione_1/Build_es_1/CMakeFiles/Prog_Printargs.dir
+/home/pcsdocker/Data/Esercitazioni_PCS_Gianni/Esercitazione_1/Build_es_1/CMakeFiles/edit_cache.dir
+/home/pcsdocker/Data/Esercitazioni_PCS_Gianni/Esercitazione_1/Build_es_1/CMakeFiles/rebuild_cache.dir
