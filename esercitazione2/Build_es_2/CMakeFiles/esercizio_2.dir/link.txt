@@ -1,1 +1,0 @@
-/usr/bin/c++  -Wall -Wshadow -Werror=vla -arch arm64 -Wl,-search_paths_first -Wl,-headerpad_max_install_names CMakeFiles/esercizio_2.dir/esercizio_2_Gianni.cpp.o -o esercizio_2
