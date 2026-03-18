@@ -1,0 +1,6 @@
+Il motivo per cui alla riga 14 del programma viene stampato 0, nonostante x fosse definita uguale a 1 alla riga 9, è poiché alla riga 12 il comando (&y)[1] = 0 va ad accedere alla posizione in memoria di y + 1*sizeof(y) la quale, essendo sizeof(y)=4 poiché y è intero, coincide proprio con la posizione di x.
+
+Infatti, se stampo le posizioni delle due variabili x,y:
+&y = 0x16b637144
+&x = 0x16b637148
+posso subito osservare che la posizione di y differisce da quella di x di esattamente 4byte (=sizeof(y)). Dunque, quando eseguo il comando (&y)[1] = 0 quello che succede è che vado ad accedere alla posizione di y + 4byte, la quale coincide proprio con quella di x, e quindi vado a sovrascrivere il valore di x stesso con zero.
