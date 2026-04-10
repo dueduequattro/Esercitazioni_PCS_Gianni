@@ -15,6 +15,9 @@ add_test(NAME insertionsort COMMAND test_insertionsort)
 add_executable(test_selectionsort test_selectionsort.cpp timecounter.cpp)
 add_test(NAME selectionsort COMMAND test_selectionsort)
 
+add_executable(test_strings test_strings.cpp)
+add_test(NAME strings COMMAND test_strings)
+
 add_executable(delta_times delta_times.cpp timecounter.cpp)
 
 enable_testing()
