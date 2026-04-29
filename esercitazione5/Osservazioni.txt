@@ -1,0 +1,9 @@
+A seguito dei test quello che si osserva è che l'algoritmo n^2 più veloce è l'InsertionSort mentre quello più veloce nlogn è il QuickSort. 
+
+In particolare sulla mia macchina (CPU Apple M2) ho osservato che la dimensione di soglia da cui il QuickSort diventa più veloce dell'InsertionSort è N_R = 285 (circa) in modalità Release mentre è N_D = 70 (circa) in modalità Debug.
+
+Osserviamo tuttavia che il risultato che si trova graficamente restituisce come valore di prima intersezione un valore inferiore (circa 30 in modalità Debug e 150 in modalità Release) ma questo è dovuto da rumore nei risultati causati dalla gestione delle varie memorie Cache e RAM.
+
+Infatti dal grafico Insertion vs Quick (ottenuto con dati in modalità Debug) vediamo chiaramente come dalla dimensione 30 fino alla dimensione 70 circa le due curve si intersechino parecchie volte, sintomo che non è ancora netta la differenza di performance tra i due sort.
+
+In conclusione osserviamo inoltre come il MySort ottenuto mescolando il comportamento di Insertion e Quick sia più performante del std::sort integrato.
