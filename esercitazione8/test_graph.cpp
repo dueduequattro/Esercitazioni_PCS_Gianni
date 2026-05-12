@@ -23,14 +23,14 @@ int main() {
     std::cout << "Provo a reinserire il nodo 2 (dovrei ottenere errore poiche' gia' presente).\n";
     grafo.add_node(2);
 
-    std::cout <<"\n"<< "Inserisco gli archi (1,2), (2,3), (3,4), (4,1) con il metodo .add_edge()\n";
+    std::cout <<"\n"<< "Inserisco gli archi (1,2), (2,3), (4,1), (3,4) in questo ordine con il metodo .add_edge()\n";
     grafo.add_edge(1, 2);
     grafo.add_edge(2, 3);
-    grafo.add_edge(3, 4);
     grafo.add_edge(4, 1);
+    grafo.add_edge(3, 4);
     
-    std::cout << "Inserisco l'arco (1,3) passando direttamente una classe undirected_edge.\n";
-    undirected_edge<int> arco_diagonale(1, 3);
+    std::cout << "Inserisco l'arco (3,1) passando direttamente una classe undirected_edge.\n";
+    undirected_edge<int> arco_diagonale(3, 1);
     grafo.add_edge(arco_diagonale);
 
     std::cout << "Provo a inserire l'arco (2,1) (dovrei ottenere un errore poiche' (2,1) = (1,2) gia' presente nel grafo).\n";
@@ -48,9 +48,10 @@ int main() {
     std::cout << "\n";
 
     std::vector<undirected_edge<int>> archi = grafo.all_edges();
-    std::cout << "Stampo tutti gli archi del grafo usando il metodo .all_edges() e l'operatore << introdotto in undirected_edge: ";
+    std::cout << "Stampo tutti gli archi del grafo usando il metodo .all_edges() e l'operatore << introdotto in undirected_edge: "; 
     for (const auto& a : archi) std::cout << a << " ";
     std::cout << "\n";
+    std::cout <<  "Osserviamo che gli archi sono stati ordinati sia a livello interno [(3,1) e (4,1) sono diventati (1,3) e (1,4)] sia a livello esterno in ordine 'alfabetico' \n";
 
     // 3. Test vicinato
     std::cout << "\n\n--- Test Neighbours ---\n";
@@ -69,7 +70,6 @@ int main() {
         std::cout << "Cerco l'indice dell'arco (3,4) con il metodo .edge_number() "<<"\n";
         std::cout << "L'arco " << arco_da_cercare << " si trova all'indice: " << indice.value() << "\n";
         
-        // MODIFICA QUI: Aggiunto .value() alla fine di edge_at per estrarre l'arco dall'optional
         std::cout << "Verifica la correttezza di tale indice con il metodo .edge_at(" << indice.value() << "): " << grafo.edge_at(indice.value()).value() << "\n";
     } else {
         std::cout << "Arco " << arco_da_cercare << " non trovato.\n";

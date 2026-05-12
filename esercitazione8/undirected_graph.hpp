@@ -48,6 +48,7 @@ public:
 			adj_list[t].insert(f);
 			//con il metodo push_back aggiungo l'arco edge al vettore
 			edges_vector.push_back(edge);
+			std::sort(edges_vector.begin(), edges_vector.end());
 		}
     }
     
@@ -66,6 +67,7 @@ public:
 			auto it = std::find(edges_vector.begin(), edges_vector.end(), edge);
         	if (it != edges_vector.end()) {
             	edges_vector.erase(it);
+            	std::sort(edges_vector.begin(), edges_vector.end());
         	}
 		}
 	}
