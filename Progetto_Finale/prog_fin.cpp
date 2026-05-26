@@ -54,7 +54,7 @@ int main(int argc, const char *argv[]){
 	}
 	
 	/*
-	PROVA DI STAMPA
+	PROVA DI STAMPA lettura file
 	for (const auto& [chiave, vec] : circuito) {
     	std::cout << chiave << ": ";
 		for (const double val : vec) {
@@ -68,25 +68,28 @@ int main(int argc, const char *argv[]){
 	for(const auto& [chiave_1,nodi] : circuito){
 		grafo_circuito.add_edge(nodi.nodo1,nodi.nodo2);
 	}
-	std::cout << "Stampo grafo circuito \n";
-	grafo_circuito.print();
 	
 	lifo<int> s;
 	undirected_graph<int> grafo_circuito_dfs = graph_visit (grafo_circuito, grafo_circuito.all_nodes()[0], s);
-	
-	std::cout << "\nStampo grafo circuito dfs \n";
-	grafo_circuito_dfs.print();
-	
 	undirected_graph<int> coalbero = grafo_circuito - grafo_circuito_dfs;
-	std::cout << "\nStampo coalbero\n";
-	coalbero.print();
 	
 	//creo una copia della visita T di G
 	undirected_graph<int> grafo_maglie = grafo_circuito_dfs;
+	
 	//riempo con gli archi mancati per ottenere le maglie
 	for(const auto& arco : coalbero.all_edges()){
 		grafo_maglie.add_edge(arco.from(), arco.to());
 	}
+	
+	std::cout << "Stampo grafo circuito \n";
+	grafo_circuito.print();
+	
+	std::cout << "\nStampo grafo circuito dfs \n";
+	grafo_circuito_dfs.print();
+	
+	std::cout << "\nStampo coalbero\n";
+	coalbero.print();
+	
 	std::cout << "\nStampo grafo_maglie\n";
 	grafo_maglie.print();
 	
