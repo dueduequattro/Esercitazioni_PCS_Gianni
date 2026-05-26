@@ -9,6 +9,7 @@ dei due fattori, dunque potrebbe generare errore*/
 struct str_gradcgn_res {
 	Eigen::VectorXd x;
 	bool fine;
+	bool controllo;
 	double tol;
 	int iter;
 };
@@ -17,9 +18,11 @@ struct str_gradcgn_res {
 str_gradcgn_res gcd(const Eigen::VectorXd& x_0, const Eigen::MatrixXd& A, const Eigen::VectorXd& b, const int k_max, const double tol){
 	str_gradcgn_res risultato;
 	risultato.iter = 0;
+	risultato.controllo = true;
 	
 	if(x_0.size()!=b.size() || x_0.size()!=A.rows() || A.rows()!=A.cols()){
 		std::cout<<"Errore, dimensioni dei dati in input incompatibili. \n";
+		risultato.controllo = false; //restituisco false in controllo
 	} else {
 		//Help from Gemini per determinare un controllo sulla simmetria di A
 		bool simmetrica = A.isApprox(A.transpose());
