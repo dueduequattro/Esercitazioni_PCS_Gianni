@@ -10,6 +10,7 @@
 #include "undirected_edge.hpp"
 #include "undirected_graph.hpp"
 #include "visita.hpp"
+#include "dijkstra.hpp"
 
 struct valor_input {
     double peso;
@@ -37,12 +38,6 @@ RisultatoLettura lettura_file(const int argc, const char *argv[]){
 	std::string filename;
 	filename = argv[1];
 	std::ifstream ifs(filename);
-	
-	/*
-	********************
-	DOMANDA DA FARE: dobbiamo gestire eventuali linee vuote nel file di input con sstream?
-	********************
-	*/
 	
 	//gestione errore lettura file
 	if (!ifs.is_open()) {
@@ -84,6 +79,7 @@ RisultatoLettura lettura_file(const int argc, const char *argv[]){
 int main(const int argc, const char *argv[]){
 	RisultatoLettura res = lettura_file(argc, argv);
 	
+	
 	if (res.controllo == false){ //termino il programma se ho avuto un errore in fase di lettura/apertura file
 		return 1;
 	}
@@ -101,6 +97,7 @@ int main(const int argc, const char *argv[]){
 	
 	Eigen::MatrixXd R = v_res.asDiagonal();
 	//Eigen::MatrixXd B(resistori,c_minimi);
+	
 	lifo<int> s;
 	undirected_graph<int> grafo_circuito_dfs = graph_visit (grafo_circuito, grafo_circuito.all_nodes()[0], s); //visita_dfs del grafo originale
 	undirected_graph<int> coalbero = grafo_circuito - grafo_circuito_dfs; //coalbero ottenuto come differenza del grafo originale - visita_dfs
@@ -112,16 +109,7 @@ int main(const int argc, const char *argv[]){
 	}
 	
 	
-	/*
-	PROVA DI STAMPA lettura file
-	for (const auto& [chiave, vec] : circuito) {
-    	std::cout << chiave << ": ";
-		for (const double val : vec) {
-			std::cout << val << " ";
-		}
-		std::cout << std::endl;
-	}
-	*/
+	std::vector<std::vector<int>> c_minimi = cicli_minimi(grafo_circuito, coalbero);
 	
 	
 	std::cout << "Stampo grafo circuito \n";
