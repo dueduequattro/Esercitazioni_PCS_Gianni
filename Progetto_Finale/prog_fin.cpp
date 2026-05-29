@@ -11,6 +11,9 @@
 #include "undirected_graph.hpp"
 #include "visita.hpp"
 #include "dijkstra.hpp"
+#include "depina.hpp"
+#include "cicli_non_minimi.hpp"
+#include "matrici.hpp"
 
 struct valor_input {
     double peso;
@@ -23,6 +26,7 @@ struct RisultatoLettura {
     int resistori;
     bool controllo;
 };
+
 
 RisultatoLettura lettura_file(const int argc, const char *argv[]){
 	RisultatoLettura res; //creo mappa per salvare gli elementi del circuito (l'ipotesi di assenza di elementi in parallelo mi permette di usare la stringa R# o V# come chiave)
@@ -99,7 +103,7 @@ int main(const int argc, const char *argv[]){
 	//Eigen::MatrixXd B(resistori,c_minimi);
 	
 	lifo<int> s;
-	undirected_graph<int> grafo_circuito_dfs = graph_visit (grafo_circuito, grafo_circuito.all_nodes()[0], s); //visita_dfs del grafo originale
+	undirected_graph<int> grafo_circuito_dfs = graph_visit(grafo_circuito, grafo_circuito.all_nodes()[0], s); //visita_dfs del grafo originale
 	undirected_graph<int> coalbero = grafo_circuito - grafo_circuito_dfs; //coalbero ottenuto come differenza del grafo originale - visita_dfs
 	undirected_graph<int> grafo_maglie = grafo_circuito_dfs; //creo una copia della visita T di G
 	
@@ -109,9 +113,13 @@ int main(const int argc, const char *argv[]){
 	}
 	
 	
-	std::vector<std::vector<int>> c_minimi = cicli_minimi(grafo_circuito, coalbero);
+	std::vector<std::vector<int>> maglie = cicli_minimi(grafo_circuito, coalbero);
+	int num_maglie = maglie.size();
 	
-	
+	dati_sistema dati = matrice_incidenza(res.circuito, maglie, res.resistori, num_maglie);
+	Eigen::MatrixXd B = dati.B;
+	Eigen::VectorXd v = dati.v;
+
 	std::cout << "Stampo grafo circuito \n";
 	grafo_circuito.print();
 	

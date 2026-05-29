@@ -1,3 +1,4 @@
+#pragma once
 #include <iostream>
 #include <set>
 #include <vector>
@@ -28,3 +29,5 @@ undirected_graph<I> graph_visit (const undirected_graph<I>& grafo, const I& nodo
 	}
 	return visita;
 }
+
+

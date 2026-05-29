@@ -44,22 +44,24 @@ dijkstra_result<I> dijkstra(const undirected_graph<I>& graph, const I& source) {
         auto u = nearest_pair.second;
         distance_set.erase(distance_set.begin());
                 
-		auto opt_neighbors = graph.neighbors(u);
-        
-		if (opt_neighbors.has_value()) {
-			for (const I& neighbor : opt_neighbors.value()) {
-				// La distanza associata ad ogni arco è 1
-				int dist_through_u = result.dist[u] + 1; 
+		// Se la distanza minima trovata è infinito, fermati
+        if (nearest_pair.first >= n_nodes + 1) {
+            break;
+        }        
+		
+		std::set<I> neighbors = graph.neighbors(u);
+		for (const I& neighbor : neighbors) {
+			// La distanza associata ad ogni arco è 1
+			int dist_through_u = result.dist[u] + 1; 
+			
+			if (result.dist[neighbor] > dist_through_u) {
+				int old_dist = result.dist[neighbor];
 				
-				if (result.dist[neighbor] > dist_through_u) {
-					int old_dist = result.dist[neighbor];
-					
-					result.dist[neighbor] = dist_through_u;
-					result.pred[neighbor] = u;
-					
-					distance_set.erase({old_dist, neighbor});
-					distance_set.insert({dist_through_u, neighbor});
-				}
+				result.dist[neighbor] = dist_through_u;
+				result.pred[neighbor] = u;
+				
+				distance_set.erase({old_dist, neighbor});
+				distance_set.insert({dist_through_u, neighbor});
 			}
 		}
 	}
