@@ -58,7 +58,6 @@ RisultatoLettura lettura_file(const int argc, const char *argv[]){
 	return res;
 	}
 	
-	// Lo togliamo?
 	std::cout << "File caricato correttamente.\n\n";
 	
 	std::string key;
@@ -67,7 +66,7 @@ RisultatoLettura lettura_file(const int argc, const char *argv[]){
 	
 	while (std::getline(ifs, linea)) {
 		
-		// Senza queste due linee alla riga 74 viene stampata la stringa, poi linea che finisce con \r, quindi lo stream torna a capo e stampa
+		// Senza queste due linee alla riga 85 viene stampata la stringa, poi linea che finisce con \r, quindi lo stream torna a capo e stampa
 		// il carattere ' sovrascrivendo la lettera A.
 		if (!linea.empty() && linea.back() == '\r') {
 			linea.pop_back();
@@ -341,7 +340,7 @@ public:
 };
 
 template<typename I> requires std::integral<I>
-undirected_graph<I> graph_visit (const undirected_graph<I>& grafo, const I& nodo_partenza, auto contenitore){
+undirected_graph<I> graph_visit (const undirected_graph<I>& grafo, const I& nodo_partenza, auto& contenitore){
 	std::set<I> reached;
 	undirected_graph<I> visita;
 	
@@ -375,7 +374,7 @@ struct dijkstra_result {
 };
 
 template<typename I> requires std::integral<I>
-dijkstra_result<I> dijkstra(const undirected_graph<I>& graph, const I& source) {
+dijkstra_result<I> dijkstra_ciclo_minimo(const undirected_graph<I>& graph, const I& source, const I& target) {
     
     dijkstra_result<I> result; 
     
@@ -406,6 +405,9 @@ dijkstra_result<I> dijkstra(const undirected_graph<I>& graph, const I& source) {
         auto u = nearest_pair.second;
         distance_set.erase(distance_set.begin());
                 
+		// Se ho raggiunto il target non mi serve esplorare oltre
+		if (u == target) break;
+				
 		// Se la distanza minima trovata è infinito, fermati
         if (nearest_pair.first >= infinito) {
             break;
@@ -432,29 +434,83 @@ dijkstra_result<I> dijkstra(const undirected_graph<I>& graph, const I& source) {
 }
 
 
+// BFS
+
+template <typename I> requires std::integral<I>
+struct bfs_result {
+    std::vector<int> dist;
+    std::vector<std::optional<I>> pred;
+};
+
+template<typename I> requires std::integral<I>
+bfs_result<I> bfs_cammino_minimo(const undirected_graph<I>& graph, const I& source, const I& target) {
+    
+    bfs_result<I> result; 
+    
+    std::vector<I> nodes = graph.all_nodes();
+
+    // Poiché all_nodes() popola il vettore da una std::map, è già ordinato: l'ultimo elemento è sicuramente l'ID più grande
+    I max_node = nodes.empty() ? 0 : nodes.back();
+   
+    const int infinito = static_cast<int>(nodes.size() + 2);
+    
+    result.dist.assign(max_node + 1, infinito);
+    result.pred.assign(max_node + 1, std::nullopt);
+    
+    fifo<I> coda;
+    
+    result.dist[source] = 0;
+    coda.put(source);
+    
+    while (!coda.empty()) {
+        auto u_opt = coda.get();
+        if (u_opt == std::nullopt) break;
+        
+        I u = *u_opt;
+        
+        // Se raggiungiamo il nodo finale ci fermiamo
+        if (u == target) {
+            break;
+        }
+        
+        std::set<I> neighbors = graph.neighbors(u);
+        
+		for (const I& neighbor : neighbors) {
+            // Se la distanza è infinito, il nodo non è ancora stato visitato
+            if (result.dist[neighbor] == infinito) {
+                result.dist[neighbor] = result.dist[u] + 1;
+                result.pred[neighbor] = u;
+                coda.put(neighbor);
+            }
+        }
+    }
+    
+    return result;
+}
+
+
 
 // Algoritmo di De Pina
 
 
 template<typename I> requires std::integral<I>
-undirected_graph<I> duplica(const undirected_graph<I>& grafo, const std::vector<std::vector<int>>& S, const int i){
+undirected_graph<I> duplica(const undirected_graph<I>& grafo, const I M, const std::vector<std::vector<int>>& S, const int i){
 	undirected_graph<I> grafo_duplica;
 	for(const auto& nodo : grafo.all_nodes()){
-		//se ci fosse un nodo zero ci sarebbe un problema: ipotizzo etichetta nodi>=1
 		grafo_duplica.add_node(nodo);
-		grafo_duplica.add_node(-nodo);
+		grafo_duplica.add_node(nodo+M);
 	}
-	
+
 	auto archi_grafo_1 = grafo.all_edges();
-	
+
 	int idx = 0;
 	for(const auto& e_1 : archi_grafo_1){
 		if(S[i][idx]==1){
-			grafo_duplica.add_edge(e_1.from(),-e_1.to());
-			grafo_duplica.add_edge(-e_1.from(),e_1.to());
+			grafo_duplica.add_edge(e_1.from(),(e_1.to()+M));
+			grafo_duplica.add_edge((e_1.from()+M),e_1.to());
 		} else {
 			grafo_duplica.add_edge(e_1.from(),e_1.to());
-			grafo_duplica.add_edge(-e_1.from(),-e_1.to());
+			grafo_duplica.add_edge((e_1.from()+M),(e_1.to()+M));
 		}
 		
 		idx++;
@@ -462,21 +518,31 @@ undirected_graph<I> duplica(const undirected_graph<I>& grafo, const std::vector<
 	return grafo_duplica;
 }
 
+
 template<typename I> requires std::integral<I>
 std::vector<std::vector<I>> depina(const undirected_graph<I>& grafo, std::vector<std::vector<int>>& S, const int k, const int m){
 	std::vector<std::vector<I>> cicli(k);
 	
+	// Calcolo la maggiore etichetta associata al nodo
+	I max_nodo = 0;
+	for(const auto& v : grafo.all_nodes()){
+		if (v > max_nodo) {
+			max_nodo = v;
+		}
+	}
+	const I M = max_nodo + 1;
+	
 	
 	for(int i = 0; i<k; i++){
-		undirected_graph<I> grafo_duplica = duplica(grafo, S, i);
+		undirected_graph<I> grafo_duplica = duplica(grafo, M, S, i);
 		
 		int distanza_minore = 2*(grafo.all_nodes().back());
 		I nodo_migliore = grafo.all_nodes()[0];
-		std::map<I, std::optional<I>> predecessori;
+		std::vector<std::optional<I>> predecessori;
 		
 		// Per trovare il ciclo minimo ad ogni step non abbiamo calcolato il vettore C_mu, ma abbiamo semplicemente preso il cammino di lunghezza minore.
 		// Questo porta allo stesso risultato, gestendo differentemente i casi in cui parto con l'esplorazione da un nodo che non fa parte di alcun ciclo.
-		// Nel formalismo matematico, algebra modulo 2 permette di cancellare gli archi che percorro un numero pari di volte, ovvero riesco a cancellare
+		// Nel formalismo matematico, l'algebra modulo 2 permette di cancellare gli archi che percorro un numero pari di volte, ovvero riesco a cancellare
 		// gli archi che non fanno parte del ciclo. Se applicassi l'algoritmo ad un grafo "a lecca lecca", con un nodo u collegato ad un triangolo, il vettore
 		// C_mu che ottengo partendo da ciascun nodo è uguale. In questa implementazione, invece, il cammino dal nodo u- a u+ contiene il doppio passaggio
 		// per l'arco fuori dal ciclo. In questo caso la lunghezza del cammino trovato partendo da u è 5, mentre se parto da un nodo del ciclo ottengo lunghezza 3:
@@ -485,13 +551,17 @@ std::vector<std::vector<I>> depina(const undirected_graph<I>& grafo, std::vector
 		
 		// Trovo nodo migliore, ovvero il cui cammino minimo da v- a v+ è di lunghezza minore per ogni v
 		for(const auto& v : grafo.all_nodes()){
-			dijkstra_result<I> r_dij = dijkstra(grafo_duplica, -v);
-			int distanza = r_dij.dist[v];
+			bfs_result<I> r_bfs = bfs_cammino_minimo(grafo_duplica, v+M, v);
+			int distanza = r_bfs.dist[v];		
 			
 			if (distanza < distanza_minore){
 				distanza_minore = distanza;
 				nodo_migliore = v;
-				predecessori = r_dij.pred;
+				predecessori = r_bfs.pred;
+				
+				if (distanza_minore == 3) {	
+					break; // Il triangolo è il minore ciclo possibile
+				}
 			}
 		}
 		std::vector<I> nodi_cammino(distanza_minore + 1);
@@ -506,7 +576,9 @@ std::vector<std::vector<I>> depina(const undirected_graph<I>& grafo, std::vector
 		
 		// Prendo i valori assoluti per avere ciclo minimo in G
 		for(int step = 0; step <= distanza_minore; step++) {
-            nodi_cammino[step] = std::abs(nodi_cammino[step]);
+			if (nodi_cammino[step] >= M) {
+				nodi_cammino[step] -= M;
+			}
         }
 		
 		cicli[i] = nodi_cammino;
@@ -543,7 +615,6 @@ std::vector<std::vector<I>> depina(const undirected_graph<I>& grafo, std::vector
 			// Se è dispari, aggiorno S[j]
 			if (prod_scalare % 2 == 1) {
 				for (int arco = 0; arco < m; arco++) {
-					// Operatore XOR bit a bit
 					S[j][arco] = S[j][arco] ^ S[i][arco]; 
 				}
 			}
@@ -733,7 +804,7 @@ struct risultato_gc {
 };
 
 risultato_gc gradiente_coniugato(const Eigen::MatrixXd& A, const Eigen::VectorXd& b, Eigen::VectorXd& x,
-const unsigned int it_max = 1000, const double res_tol = 1.0e-13) {
+const unsigned int it_max = 1000, const double res_tol = 1.0e-6) {
 		
 	// Controllo che le dimensioni combacino ma non se la matrice A 
 	// è simmetrica definita positiva, troppo costoso

@@ -20,6 +20,8 @@ int main(const int argc, const char *argv[]){
 	undirected_graph<int> coalbero = grafo_circuito - grafo_circuito_dfs; //coalbero ottenuto come differenza del grafo originale - visita_dfs
 	
 	std::vector<std::vector<int>> maglie = cicli_minimi(grafo_circuito, coalbero);
+	//std::vector<std::vector<int>> maglie = cicli_fondamentali_dfs(grafo_circuito_dfs, coalbero);
+	
 	int num_maglie = maglie.size();
 	
 	dati_sistema dati = calcola_sistema(res.circuito, maglie, res.resistori, num_maglie);
