@@ -5,7 +5,7 @@
 #include <vector>
 #include <map>
 #include <string>
-#include <eigen3/Eigen/Dense>
+#include <Eigen/Dense>
 #include <concepts>
 #include <algorithm>
 #include <set>

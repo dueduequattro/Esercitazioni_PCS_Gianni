@@ -1,6 +1,6 @@
 #pragma once
 #include <iostream>
-#include <eigen3/Eigen/Dense>
+#include <Eigen/Dense>
 
 struct risultato_gc {
 	Eigen::VectorXd sol; 
